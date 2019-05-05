@@ -1,3 +1,14 @@
+/**
+ * b - Boolean
+ * n - Number
+ * o - Object
+ *   a - Array
+ *   d - Date
+ *   f - Function
+ *   r - RegExp
+ * s - String
+ * <null, undefined>
+ */
 
 /**
  * 版本号比较
@@ -22,42 +33,42 @@ export function compareVersion(sVer, sCompareVer) {
 
 /**
  * 格式化时间
- * @param {Number} time 
+ * @param {Number} dTime 
  * @param {String} cFormat - default: {y}-{m}-{d} {h}:{i}:{s}
  * @return {String}        
  */
-export function parseTime(time, cFormat) {
+export function parseTime(dTime, cFormat) {
   if (arguments.length === 0) {
     return null
   }
-  var format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}'
-  var date
-  if (time === null) {
+  var sFormat = cFormat && cFormat.toLocaleLowerCase() || '{y}-{m}-{d} {h}:{i}:{s}'
+  var dValue
+  if (dTime === null) {
     return
-  } else if (typeof time === 'object') {
-    date = time
+  } else if (typeof dTime === 'object') {
+    dValue = dTime
   } else {
-    if (('' + time).length === 10) time = parseInt(time) * 1000
-    date = new Date(time)
+    if (('' + dTime).length === 10) dTime = parseInt(dTime) * 1000
+    dValue = new Date(dTime)
   }
   var formatObj = {
-    y: date.getFullYear(),
-    m: date.getMonth() + 1,
-    d: date.getDate(),
-    h: date.getHours(),
-    i: date.getMinutes(),
-    s: date.getSeconds(),
-    a: date.getDay()
+    y: dValue.getFullYear(),
+    m: dValue.getMonth() + 1,
+    d: dValue.getDate(),
+    h: dValue.getHours(),
+    i: dValue.getMinutes(),
+    s: dValue.getSeconds(),
+    a: dValue.getDay()
   }
-  var time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, function (result, key) {
-    var value = formatObj[key]
-    if (key === 'a') { 
-      return ['日', '一', '二', '三', '四', '五', '六'][value]
+  var sTime = sFormat.replace(/{(y|m|d|h|i|s|a)+}/g, function (aResult, sKey) {
+    var nValue = formatObj[sKey]
+    if (sKey === 'a') {
+      return ['日', '一', '二', '三', '四', '五', '六'][nValue]
     }
-    if (result.length > 0 && value < 10) {
-      value = '0' + value
+    if (aResult.length > 0 && nValue < 10) {
+      nValue = '0' + nValue
     }
-    return value || 0
+    return nValue || 0
   })
-  return time_str
+  return sTime
 }
