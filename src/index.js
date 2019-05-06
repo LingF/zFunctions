@@ -8,6 +8,7 @@
  *   r - RegExp
  * s - String
  * <null, undefined>
+ * c - 可选
  */
 
 /**
