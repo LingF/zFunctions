@@ -73,3 +73,21 @@ export function parseTime(dTime, cFormat) {
   })
   return sTime
 }
+
+/**
+ * 是否夏令时（中国：本地时间）
+ * @param {Number} nTimestamp
+ * @return {Boolean}
+ *    中国夏令时：
+ *      1986年 5月4日 开始到 9月14日
+ *      1987年 至 1991年
+ *        从4月中旬的第一个星期日2时整（北京时间）到 
+ *        9月中旬第一个星期日的凌晨2时整（北京夏令时）
+ */
+export function isChinaDST(nTimestamp) {
+  var dThatDate = new Date(nTimestamp)
+  var dBaseDate = new Date(dThatDate.getFullYear() + '/1/1')
+  var nThatUtcOffset = dThatDate.getTimezoneOffset()
+  var nBaseUtcOffset = dBaseDate.getTimezoneOffset()
+  return nBaseUtcOffset === nThatUtcOffset
+}
