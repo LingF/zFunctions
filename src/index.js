@@ -75,6 +75,7 @@ export function parseTime(dTime, cFormat) {
 }
 
 /**
+ * _并未达到预期_
  * 是否夏令时（中国：本地时间）
  * @param {Number} nTimestamp
  * @return {Boolean}
@@ -84,10 +85,74 @@ export function parseTime(dTime, cFormat) {
  *        从4月中旬的第一个星期日2时整（北京时间）到 
  *        9月中旬第一个星期日的凌晨2时整（北京夏令时）
  */
-export function isChinaDST(nTimestamp) {
-  var dThatDate = new Date(nTimestamp)
-  var dBaseDate = new Date(dThatDate.getFullYear() + '/1/1')
-  var nThatUtcOffset = dThatDate.getTimezoneOffset()
-  var nBaseUtcOffset = dBaseDate.getTimezoneOffset()
-  return nBaseUtcOffset === nThatUtcOffset
+/**
+ *  export function isChinaDST(nTimestamp) {
+ *    var dThatDate = new Date(nTimestamp)
+ *    var dBaseDate = new Date(dThatDate.getFullYear() + '/1/1')
+ *    var nThatUtcOffset = dThatDate.getTimezoneOffset()
+ *    var nBaseUtcOffset = dBaseDate.getTimezoneOffset()
+ *    return nBaseUtcOffset === nThatUtcOffset
+ *  }
+ */
+
+/**
+ * 获取url参数
+ * @param {String} sURL
+ * @return {String}
+ */
+function getURLSearch(sURL) {
+  var cURLSearch = typeof sURL === 'string' ? sURL.split('?') : null
+  return cURLSearch ? cURLSearch[1] : location.search
+}
+
+/**
+ * 获取url参数值
+ * @param {String} sKey
+ * @param {String} sURL
+ * @return {String}
+ */
+export function getURLParams(sKey, sURL) {
+  var sTargetSearch = getURLSearch(sURL)
+  if (!sKey) return null
+  var oParams = new URLSearchParams(sTargetSearch)
+  return oParams.get(sKey)
+}
+
+/**
+ * 设置url参数值
+ * @param {Object} cKeyValue
+ * @param {String} sURL
+ * @return {String}
+ */
+export function setURLParams(cKeyValue, sURL) {
+  var sTargetSearch = getURLSearch(sURL)
+  if (!cKeyValue || !Object.keys(cKeyValue).length) return sURL || location.href
+  var oParams = new URLSearchParams(sTargetSearch)
+  Object.keys(cKeyValue).forEach(sKey => {
+    oParams.set(sKey, cKeyValue[key])
+  })
+  var sParams = decodeURIComponent(oParams.toString())
+  return sURL ? `${sURL.split('?')[0]}?${sParams}` : `${location.origin}${location.pathname}?${sParams}`
+}
+
+/**
+ * 删除url参数值
+ * @param {String | Array} cKeyValue
+ * @param {String} sURL
+ * @return {String}
+ */
+export function deleteURLParams(cKeyValue, sURL) {
+  var sTargetSearch = getURLSearch(sURL)
+  if (!cKeyValue) return sURL || location.href
+  var oParams = new URLSearchParams(sTargetSearch)
+  if (typeof cKeyValue === 'string') {
+    oParams.delete(cKeyValue)
+  } else if (Array.isArray(cKeyValue) && cKeyValue.length) {
+    cKeyValue.forEach(sKey => {
+      oParams.delete(sKey)
+    })
+  }
+  var sParams = decodeURIComponent(oParams.toString())
+  sParams = sParams ? `?${sParams}` : ''
+  return sURL ? `${sURL.split('?')[0]}${sParams}` : `${location.origin}${location.pathname}${sParams}`
 }

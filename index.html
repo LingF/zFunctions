@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>夏令时测试</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/mint-ui/lib/style.css">
+  <style>
+    body {
+      background-color: #fafafa;
+    }
+    .page-part {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="page-part">
+      <mt-button @click.native="handleClick">选择日期</mt-button>
+      <mt-datetime-picker ref="picker" type="date" v-model="pickerValue" :start-date="startDate" :end-date="endDate" @confirm="handleConfirm">
+      </mt-datetime-picker>
+      <mt-cell title="日期">{{ label }}</mt-cell>
+      <mt-cell title="格式化">{{ label | filterDate }}</mt-cell>
+      <mt-cell title="是否夏令时">{{ label | filterDST }}</mt-cell>
+    </div>
+    <div class="page-part">
+      <mt-field label="自定义" placeholder="请输入日期" v-model="inputDate"></mt-field>
+      <mt-cell title="自定义日期">{{ inputDate | filterDate }}</mt-cell>
+      <mt-cell title="是否夏令时">{{ inputDate | filterDST }}</mt-cell>
+    </div>
+    <div class="page-part">
+      <mt-cell title="toString">{{ now.toString() }}</mt-cell>
+      <mt-cell title="Offset">{{ now.getTimezoneOffset() }}</mt-cell>
+      <mt-cell title="Offset In Hours">{{ now.getTimezoneOffset() }}</mt-cell>
+      <mt-cell title="Offset In Hours">{{ now.dst() }}</mt-cell>
+    </div>
+    <div class="page-part">
+      <mt-cell :title="value.key" v-for="(value, name, index) in toStringAry" :key="index">{{ value.value }}</mt-cell>
+      <!-- <mt-cell title="isDST">{{ moment(nowAry).isDST() }}</mt-cell>
+      <mt-cell title="utcOffset">{{ moment(nowAry).utcOffset(480).format('YYYY-MM-DD HH:mm:ss') }}</mt-cell> -->
+    </div>
+    <div class="page-part">
+      <mt-cell title="testLabel">{{ testLabel  }}</mt-cell>
+      <mt-cell title="toUTCString">{{ testLabel.toUTCString() }}</mt-cell>
+      <mt-cell title="to">{{ new Date(testLabel) }}</mt-cell>
+      <mt-cell title="filterDate">{{ testLabel | filterDate }}</mt-cell>
+      <mt-cell :title="value.key" v-for="(value, name, index) in toStringAry" :key="index">{{ value.value }}</mt-cell>
+
+      <mt-cell title="Offset">{{ testLabel.getTimezoneOffset() }}</mt-cell>
+      <mt-cell title="Offset In Hours">{{ testLabel.getTimezoneOffset() / 60 }}</mt-cell>
+      <mt-cell title="dst">{{ testLabel.dst() }}</mt-cell>
+    </div>
+  </div>
+  
+  <!-- 先引入 Vue -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/mint-ui/lib/index.js"></script>
+  <!-- <script src="http://momentjs.cn/downloads/moment.min.js"></script> -->
+  <script>
+    Date.prototype.stdTimezoneOffset = function() {
+      var jan = new Date(this.getFullYear(), 0, 1);
+      var jul = new Date(this.getFullYear(), 6, 1);
+      return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+    }
+
+    Date.prototype.dst = function() {
+      return this.getTimezoneOffset() < this.stdTimezoneOffset();
+    }
+
+    new Vue({
+      el: '#app',
+      filters: {
+        filterDate(dTime, cFormat) {
+          if (arguments.length === 0) {
+            return null
+          }
+          var sFormat = cFormat && cFormat.toLocaleLowerCase() || '{y}-{m}-{d} {h}:{i}:{s}'
+          var dValue
+          if (dTime === null) {
+            return
+          } else if (typeof dTime === 'object') {
+            dValue = dTime
+          } else {
+            if (('' + dTime).length === 10) dTime = parseInt(dTime) * 1000
+            dValue = new Date(dTime)
+          }
+          var formatObj = {
+            y: dValue.getFullYear(),
+            m: dValue.getMonth() + 1,
+            d: dValue.getDate(),
+            h: dValue.getHours(),
+            i: dValue.getMinutes(),
+            s: dValue.getSeconds(),
+            a: dValue.getDay()
+          }
+          var sTime = sFormat.replace(/{(y|m|d|h|i|s|a)+}/g, function (aResult, sKey) {
+            var nValue = formatObj[sKey]
+            if (sKey === 'a') {
+              return ['日', '一', '二', '三', '四', '五', '六'][nValue]
+            }
+            if (aResult.length > 0 && nValue < 10) {
+              nValue = '0' + nValue
+            }
+            return nValue || 0
+          })
+          return sTime
+        },
+        filterDST(cTimestamp) {
+          let dTimestamp = cTimestamp
+          if (!cTimestamp) return
+          if (typeof cTimestamp === 'number') {
+            dTimestamp = new Date(cTimestamp)
+          }
+          var nYear = dTimestamp.getFullYear()
+          var dThatDate = new Date(nYear, 6, 1)
+          var dBaseDate = new Date(nYear, 0, 1)
+          var nThatUtcOffset = dThatDate.getTimezoneOffset()
+          var nBaseUtcOffset = dBaseDate.getTimezoneOffset()
+          return nBaseUtcOffset !== nThatUtcOffset
+        }
+      },
+      computed: {
+        now() {
+          if (this.inputDate) {
+            return new Date(this.inputDate)
+          }
+          return this.label || new Date()
+        },
+        nowAry() {
+          var date
+          if (this.inputDate) {
+            date = new Date(this.inputDate)
+          } else {
+            date = this.label || new Date()
+          }
+          return [date.getFullYear(), date.getMonth(), date.getDate()]
+        },
+        toStringAry() {
+          var value = this.now
+          if (!(value instanceof Date)) return []
+          var result = []
+          var ary = [ "toString",
+            "toDateString",
+            "toTimeString",
+            "toISOString",
+            "toUTCString",
+            "toGMTString",
+            "toLocaleString",
+            "toLocaleDateString",
+            "toLocaleTimeString"
+          ]
+          
+          for (var i = 0, len = ary.length; i < len; i++) {
+            var key = ary[i]
+            var item = value[key]()
+            result.push({
+              key: key,
+              value: item
+            })
+          }
+          return result
+        }
+      },
+      data() {
+        return {
+          pickerValue: '',
+          inputDate: '',
+          startDate: new Date('1986/1/1'),
+          endDate: new Date(),
+          label: '',
+          // moment: moment
+          testLabel: new Date('1990/7/1')
+        }
+      },
+      methods: {
+        handleClick: function() {
+          this.$refs.picker.open();
+        },
+        handleConfirm(value) {
+          this.label = value
+        }
+      }
+    })
+  </script>
+</body>
+</html>
