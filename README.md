@@ -8,7 +8,7 @@
     * 获取URL参数值 [getURLParams](https://github.com/LingF/zFunctions/blob/master/src/index.js#L113)
     * 设置URL参数值 [setURLParams](https://github.com/LingF/zFunctions/blob/master/src/index.js#L126)
     * 删除URL参数值 [deleteURLParams](https://github.com/LingF/zFunctions/blob/master/src/index.js#L143)
-
+5. 获取类型字符串 [toRawType](https://github.com/LingF/zFunctions/blob/master/src/index.js#L164)
 
 ### 技巧
-1. 操作URL查询字符串 [URLSearchParams](https://github.com/LingF/zFunctions/blob/master/src/skill.js#L2) _4_
+1. 操作URL查询字符串 [URLSearchParams](https://github.com/LingF/zFunctions/blob/master/src/skill.js#L2) _见业务4_
