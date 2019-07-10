@@ -129,7 +129,7 @@ export function setURLParams(cKeyValue, sURL) {
   if (!cKeyValue || !Object.keys(cKeyValue).length) return sURL || location.href
   var oParams = new URLSearchParams(sTargetSearch)
   Object.keys(cKeyValue).forEach(sKey => {
-    oParams.set(sKey, cKeyValue[key])
+    oParams.set(sKey, cKeyValue[sKey])
   })
   var sParams = decodeURIComponent(oParams.toString())
   return sURL ? `${sURL.split('?')[0]}?${sParams}` : `${location.origin}${location.pathname}?${sParams}`
